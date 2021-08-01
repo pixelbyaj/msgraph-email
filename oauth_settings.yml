@@ -1,0 +1,6 @@
+app_id: "1846cae0-5409-4477-9474-0ece407aa4ae"
+client_id: "0c54a76b-9293-4fd0-89c2-4af2a5a28474"
+client_secret: "Ad_dlt8QS-a1M-g2Hqnf3Mkx7Wa2Pec2~t"
+redirect: ""
+scopes: "https://graph.microsoft.com/.default"
+authority: "https://login.microsoftonline.com/graph-api-client"
