@@ -23,7 +23,7 @@ emailService = EmailService(tenant_id, client_id, client_secret, email_address)
 ## Make a read email request
 By default it will read unread emails of the **'Inbox'** mailfolder
 ```python
-emailMessages:list(EmailMessage) = emailService.readEmails() 
+emailMessages= emailService.readEmails() 
 ```
 ## Make a send email request
 ```python
@@ -37,7 +37,11 @@ emailService.sendEmail(message)
 ```python
 emailMessages = emailService.readEmails()
 for email in emailMessages:
-    emailService.markEmailReadUnRead(email.messageId)
+    #mark it read
+    emailService.markEmailReadUnRead(email.messageId,isRead=True)
+    #mark it unread
+    #emailService.markEmailReadUnRead(email.messageId,isRead=False)
+
 ```
 ## Make a delete email request
 ```python
