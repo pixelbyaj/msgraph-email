@@ -9,7 +9,7 @@ import requests
 from requests.sessions import Session
 import json
 import base64
-from models import EmailAttachment, EmailMessage
+from mail.models import EmailAttachment,EmailMessage
 """Email Service to be used for reading/sending emails against Microsoft Graph
 
     :keyword credential: TokenCredential used to acquire an access token for the Microsoft
@@ -65,7 +65,7 @@ class EmailService:
         resonse = self.__graph_session.delete(url)        
         return response
 
-    def __getEmailAddressess(self,emailAddressess:list(str)):
+    def __getEmailAddressess(self,emailAddressess):
         __emailAddresess=[]
         for email in emailAddressess:
             __emailAddresess.append({

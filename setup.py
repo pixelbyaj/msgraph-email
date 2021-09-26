@@ -13,11 +13,10 @@ setup(
     description="Read/Send emails using Microsoft Graph API",    
     long_description=README,
     long_description_content_type="text/markdown",
-    url="https://github.com/realpython/reader",
+    url="https://github.com/pixelbyaj/msgraph-email",
     author="PixelByAJ - Abhishek Joshi",
     author_email="pixelbyaj@gmail.com",
     license="MIT",
-    py_modules=["email\msgraph\__init__.py","email\msgraph\models\__init__.py"],
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
