@@ -1,4 +1,0 @@
-requests>=2,<3
-msgraph-core
-azure-identity
-//"Qa1kAfi_qrqW3y~5ISMfuk.~A_9L8lJTGd",

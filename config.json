@@ -1,7 +1,0 @@
-{
-    "tenant_id": "",
-    "client_id": "",
-    "client_secret": "",
-    "email_user": "",
-    "scopes": ["https://graph.microsoft.com/.default"]
-}
