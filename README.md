@@ -14,7 +14,7 @@ from mail.msgraph import EmailService
 from mail.models import EmailMessage,EmailAttachment
 ```
 
-## Configure a Email_Service 
+## Configure an Email_Service 
 ```python
 
 emailService = EmailService(tenant_id, client_id, client_secret, email_address)
@@ -38,9 +38,9 @@ emailService.sendEmail(message)
 emailMessages = emailService.readEmails()
 for email in emailMessages:
     #mark it read
-    emailService.markEmailReadUnRead(email.messageId,isRead=True)
+    emailService.markEmailReadRead(email.messageId,isRead=True)
     #mark it unread
-    #emailService.markEmailReadUnRead(email.messageId,isRead=False)
+    emailService.markEmailReadUnRead(email.messageId,isRead=False)
 
 ```
 ## Make a delete email request
