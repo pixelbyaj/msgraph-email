@@ -14,18 +14,18 @@ from mail.msgraph import EmailService
 from mail.models import EmailMessage,EmailAttachment
 ```
 
-## Configure a Email_Service 
+## Configure an Email Service 
 ```python
 
 emailService = EmailService(tenant_id, client_id, client_secret, email_address)
 
 ```
-## Make a read email request
+## Process  to read an email request
 By default it will read unread emails of the **'Inbox'** mailfolder
 ```python
 emailMessages= emailService.readEmails() 
 ```
-## Make a send email request
+## Process to send an email request
 ```python
 emailMessage = EmailMessage()
 emailMessage.toEmails="test@mail.com"
@@ -33,7 +33,7 @@ emailMessage.message="Hello"
 emailService.sendEmail(message)
 ```
 
-## Make a read and unread email request
+## Process to read and unread an email request
 ```python
 emailMessages = emailService.readEmails()
 for email in emailMessages:
