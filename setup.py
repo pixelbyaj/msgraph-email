@@ -9,16 +9,16 @@ README = (HERE / "README.md").read_text()
 # This call to setup() does all the work
 setup(
     name="msgraph-email",
-    version="1.1.0",
+    version="1.1.1",
     description="Read/Send emails using Microsoft Graph API",    
     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/pixelbyaj/msgraph-email",
     author="PixelByAJ - Abhishek Joshi",
     author_email="pixelbyaj@gmail.com",
-    license="MIT",
+    license="Apache",
     classifiers=[
-        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",
     ],
