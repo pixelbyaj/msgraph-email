@@ -46,23 +46,23 @@ class EmailService:
            
     def __get(self,url):
         url = "/users/"+self.__emailAddress+"/"+url
-        resonse = self.__graph_session.get(url)
+        response = self.__graph_session.get(url)
         json_response=json.loads(response.text)
         return response
 
     def __post(self,url,headers,data):
         url = "/users/"+self.__emailAddress+"/"+url
-        resonse = self.__graph_session.post(url,data=data,headers=headers)        
+        response = self.__graph_session.post(url,data=data,headers=headers)        
         return response
     
     def __patch(self,url,headers,data):
         url = "/users/"+self.__emailAddress+"/"+url
-        resonse = self.__graph_session.patch(url,data=data,headers=headers)        
+        response = self.__graph_session.patch(url,data=data,headers=headers)        
         return response
 
     def __delete(self,url):
         url = "/users/"+self.__emailAddress+"/"+url
-        resonse = self.__graph_session.delete(url)        
+        response = self.__graph_session.delete(url)        
         return response
 
     def __getEmailAddressess(self,emailAddressess):
@@ -137,7 +137,7 @@ class EmailService:
                 __msg = EmailMessage()
                 __msg.messageId = message["id"]
                 __msg.receivedDateTime = message["receivedDateTime"]
-                __msg.sendDataTime = message["sendDataTime"]
+                __msg.sendDateTime = message["sendDateTime"]
                 __msg.messagePreview = message["bodyPreview"]
                 __msg.message = message["body"]["content"]
                 __msg.fromEmail = message["from"]["emailAddress"]["address"]

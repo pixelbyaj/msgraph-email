@@ -18,7 +18,7 @@ class EmailMessage:
     def __init__(self):
         self.messageId: str = None
         self.receivedDateTime: str = None
-        self.sendDataTime: str = None
+        self.sendDateTime: str = None
         self.fromEmail: str = None
         self.toEmails: list(str) = None
         self.ccEmails: list(str) = None
