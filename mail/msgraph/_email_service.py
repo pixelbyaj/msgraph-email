@@ -2,14 +2,17 @@
 # Copyright (c) PixelByAJ.
 # Licensed under the MIT License.
 # ------------------------------------
-from msgraph.core import GraphClient
-from azure.identity import ClientSecretCredential
-from typing import List
-import requests
-from requests.sessions import Session
-import json
 import base64
-from mail.models import EmailAttachment,EmailMessage
+import json
+from typing import List, Union
+
+import requests
+from azure.identity import ClientSecretCredential
+from msgraph.core import GraphClient
+from requests import Response
+
+from mail.models import EmailAttachment, EmailMessage
+
 """Email Service to be used for reading/sending emails against Microsoft Graph
 
     :keyword credential: TokenCredential used to acquire an access token for the Microsoft
@@ -41,28 +44,28 @@ class EmailService:
         if not email_address:
             raise ValueError("email_address should be the an Azure Active Directory application's email address")
         credential = ClientSecretCredential(tenant_id, client_id, client_secret)
-        self.__emailAddress= email_address            
+        self.__emailAddress= email_address
         self.__graph_session = GraphClient(credential=credential,**kwargs)
-           
-    def __get(self,url):
+
+    def __get(self, url) -> dict:
         url = "/users/"+self.__emailAddress+"/"+url
         response = self.__graph_session.get(url)
-        json_response=json.loads(response.text)
+        json_response = json.loads(response.text)
+        return json_response
+
+    def __post(self, url, headers, data):
+        url = "/users/"+self.__emailAddress+"/"+url
+        response = self.__graph_session.post(url,data=data,headers=headers)
         return response
 
-    def __post(self,url,headers,data):
-        url = "/users/"+self.__emailAddress+"/"+url
-        response = self.__graph_session.post(url,data=data,headers=headers)        
-        return response
-    
     def __patch(self,url,headers,data):
         url = "/users/"+self.__emailAddress+"/"+url
-        response = self.__graph_session.patch(url,data=data,headers=headers)        
+        response = self.__graph_session.patch(url,data=data,headers=headers)
         return response
 
     def __delete(self,url):
         url = "/users/"+self.__emailAddress+"/"+url
-        response = self.__graph_session.delete(url)        
+        response = self.__graph_session.delete(url)
         return response
 
     def __getEmailAddressess(self,emailAddressess):
@@ -75,7 +78,7 @@ class EmailService:
             })
 
     def __getAttachments(self,emailMessage:EmailMessage):
-        __attachments=[]        
+        __attachments=[]
         for file in emailMessage.attachments:
             __attachments.append({
                 "@odata.type":"#microsoft.graph.fileAttachment",
@@ -83,7 +86,7 @@ class EmailService:
                 "contentType":file.contentType,
                 "contentBytes":file.contentBase64
             })
-        
+
         return __attachments
 
     def __getEmail(self,emailMessage:EmailMessage):
@@ -98,19 +101,19 @@ class EmailService:
                     'content':"<html><body>"+emailMessage.message+"<html></body>"
                 }
             }
-        }                
-        
+        }
+
         if emailMessage.toEmails == None:
              raise ValueError("toRecipients should be email address")
 
-        __emailMessage['message']['toRecipients']=__getEmailAddressess(emailMessage.toEmails)        
-        
+        __emailMessage['message']['toRecipients']=self.__getEmailAddressess(emailMessage.toEmails)
+
         if emailMessage.ccEmails != None:
-            __emailMessage['message']['ccRecipients']=__getEmailAddressess(emailMessage.ccEmails)
-        
+            __emailMessage['message']['ccRecipients']=self.__getEmailAddressess(emailMessage.ccEmails)
+
         if emailMessage.bccEmails != None:
-            __emailMessage['message']['bccRecipients']=__getEmailAddressess(emailMessage.bccEmails)
-        
+            __emailMessage['message']['bccRecipients']=self.__getEmailAddressess(emailMessage.bccEmails)
+
         if emailMessage.hasAttachments:
             __emailMessage['message']['attachments']=self.__getAttachments(emailMessage)
 
@@ -142,12 +145,12 @@ class EmailService:
                 __msg.message = message["body"]["content"]
                 __msg.fromEmail = message["from"]["emailAddress"]["address"]
                 __msg.hasAttachments = message["hasAttachments"]
-                
+
                 if __msg.hasAttachments:
-                    __msg.attachments=self.readAttachments(__msg.messageId)
-                
+                    __msg.attachments = self.readAttachments(__msg.messageId)
+
                 __emailMessages.append(__msg)
-                
+
                 return __emailMessages
 
         except requests.exceptions.HTTPError as err:
@@ -157,17 +160,17 @@ class EmailService:
         try:
             if not messageId:
                 raise ValueError("messageId should be the id of an Email Message")
-            
+
             url = "/messages/"+messageId+"/attachments"
             response = self.__get(url)
             __attachments=[]
             for file in response["value"]:
                 __file = EmailAttachment()
-                __file.fileId = file["id"]    
-                __file.name = file["name"]    
-                __file.size = file["size"]    
-                __file.contentType = file["contentType"]    
-                
+                __file.fileId = file["id"]
+                __file.name = file["name"]
+                __file.size = file["size"]
+                __file.contentType = file["contentType"]
+
                 if __file.contentType != "message/rfc822":
                     __data=file["contentBytes"]
                     __dataStr= json.dumps(__data)
@@ -175,7 +178,7 @@ class EmailService:
                 else:
                     __file.isMimeType=True
                     __file.mimeBody = self.__getMimeBody(messageId, __file.fileId)
-                
+
                 __attachments.append(__file)
 
             return __attachments
@@ -186,7 +189,7 @@ class EmailService:
         try:
             __message=self.__getEmail(emailMessage=message)
             __url = "sendEmail"
-            response = self.__post(url, {'Content-Type':'application/json'}, json.dumps(__message))
+            response = self.__post(__url, {'Content-Type':'application/json'}, json.dumps(__message))
             response.raise_for_status()
             return response
         except requests.exceptions.HTTPError as err:
@@ -196,17 +199,22 @@ class EmailService:
         try:
             __message={'IsRead':isRead}
             __url = "mailFolders/"+mailFolder+"/messages/"+messageId
-            response = self.__patch(url, {'Content-Type':'application/json'}, json.dumps(__message))
-            reponse.raise_for_status()
+            response = self.__patch(__url, {'Content-Type':'application/json'}, json.dumps(__message))
+            response.raise_for_status()
             return response
         except requests.exceptions.HTTPError as err:
             return (err)
 
-    def deleteEmail(self,messageId:str,mailFolder:str="Inbox",isRead:bool=True):
+    def deleteEmail(
+            self,
+            messageId: str,
+            mailFolder: str = "Inbox",
+            isRead: bool = True
+    ) -> Union[Response, Exception]:
         try:
             __url = "mailFolders/"+mailFolder+"/messages/"+messageId
-            response = self.__delete(url)
-            reponse.raise_for_status()
+            response = self.__delete(__url)
+            response.raise_for_status()
             return response
         except requests.exceptions.HTTPError as err:
-            return (err)
+            return err
