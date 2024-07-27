@@ -1,6 +1,7 @@
 # msgraph-email
 Microsoft Graph Email API using Python 
 [![License](https://img.shields.io/badge/License-apache-blue.svg)](https://img.shields.io/badge/)
+[![Downloads](https://static.pepy.tech/badge/msgraph-email)](https://pepy.tech/project/msgraph-email)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/msgraph-email?style=plastic)](https://pypi.org/project/msgraph-email)
 [![PayPal Donate](https://img.shields.io/badge/donate-PayPal.me-ff69b4.svg)](https://www.paypal.me/pixelbyaj)
 
