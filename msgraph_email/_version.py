@@ -1,9 +1,8 @@
 # ------------------------------------
-# Copyright (c) PixelByAJ.
+# Copyright (c) Abhishek Joshi.
 # Licensed under the MIT License.
 # ------------------------------------
 
-# __init__.py
 
-# Version of the msgraph-email package
-__version__ = "1.2.0"
+# The SDK version
+SDK_VERSION = '1.3.0'
