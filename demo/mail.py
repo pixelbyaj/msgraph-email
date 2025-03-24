@@ -14,7 +14,7 @@ client_secret = os.getenv("MSGRAPH_CLIENT_SECRET")
 email_address = os.getenv("MSGRAPH_EMAIL_ADDRESS")
 scopes = ["User.Read","Mail.ReadWrite","Mail.Send","MailboxSettings.ReadWrite"]
 
-async def sendEmail(emailService: EmailService):
+async def send_email(emailService: EmailService):
     
     emailMessage = EmailMessage()
     emailMessage.subject = "Test Email"
@@ -26,7 +26,7 @@ async def main():
     authCredentials = AuthCredentials(client_id,tenant_id,client_secret,email_address,scopes)
     emailService = EmailService(authCredentials)
     await emailService.authenticate()
-    await sendEmail(emailService)
+    await send_email(emailService)
     emailMessages: List[EmailMessage] = await emailService.get_emails()
     for email in emailMessages:
         #mark it read
