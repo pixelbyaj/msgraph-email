@@ -1,6 +1,6 @@
 # ------------------------------------
 # Copyright (c) Abhishek Joshi.
-# Licensed under the MIT License.
+# Licensed under the  Apache License.
 # ------------------------------------
 
 from .models.email_message import EmailMessage

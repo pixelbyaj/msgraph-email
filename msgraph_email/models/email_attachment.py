@@ -1,5 +1,5 @@
 # ------------------------------------
-# Copyright (c) Abhishek Joshi PixelByAJ.
+# Copyright (c) Abhishek Joshi - PixelByAJ.
 # Licensed under the Apache License.
 # ------------------------------------
 from typing import Optional, Set

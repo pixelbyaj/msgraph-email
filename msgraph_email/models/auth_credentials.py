@@ -1,3 +1,8 @@
+# ------------------------------------
+# Copyright (c) Abhishek Joshi - PixelByAJ.
+# Licensed under the  Apache License.
+# ------------------------------------
+
 from typing import List
 
 

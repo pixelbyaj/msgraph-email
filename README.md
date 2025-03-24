@@ -1,55 +1,104 @@
 # msgraph-email
-Microsoft Graph Email API using Python 
-[![License](https://img.shields.io/badge/License-apache-blue.svg)](https://img.shields.io/badge/)
-[![Downloads](https://static.pepy.tech/badge/msgraph-email)](https://pepy.tech/project/msgraph-email)
-[![PyPI - Downloads](https://img.shields.io/pypi/dm/msgraph-email?style=plastic)](https://pypi.org/project/msgraph-email)
-[![PayPal Donate](https://img.shields.io/badge/donate-PayPal.me-ff69b4.svg)](https://www.paypal.me/pixelbyaj)
+
+msgraph-email is a Python package that allows you to read and send emails using the Microsoft Graph API. It provides a simple interface to interact with Microsoft Graph for email operations.
+
+## Features
+
+- Send emails
+- Read emails
+- Manage email attachments
+- Mark emails as read/unread
+- Delete emails
 
 ## Installation
-msgraph-email is available on PyPI.
-```python
-    pip install msgraph-email
+
+You can install the package using pip:
+
+```sh
+pip install msgraph-email
 ```
 
-## Import modules
+## Usage
+
+### Authentication
+
+To use the package, you need to authenticate with Microsoft Graph. You can do this by providing your Azure Active Directory credentials.
 
 ```python
-from mail.msgraph import EmailService
-from mail.models import EmailMessage,EmailAttachment
+from msgraph_email.services.email_service import EmailService
+from msgraph_email.models.auth_credentials import AuthCredentials
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+client_id = os.getenv("MSGRAPH_CLIENT_ID")
+tenant_id = os.getenv("MSGRAPH_TENANT_ID")
+client_secret = os.getenv("MSGRAPH_CLIENT_SECRET")
+email_address = os.getenv("MSGRAPH_EMAIL_ADDRESS")
+scopes = ["User.Read", "Mail.ReadWrite", "Mail.Send", "MailboxSettings.ReadWrite"]
+
+auth_credentials = AuthCredentials(client_id, tenant_id, client_secret, email_address, scopes)
+email_service = EmailService(auth_credentials)
+
+async def authenticate():
+    await email_service.authenticate()
+
+# Run the authentication
+import asyncio
+asyncio.run(authenticate())
 ```
 
-## Configure an Email Service 
-```python
+### Sending an Email
 
-emailService = EmailService(tenant_id, client_id, client_secret, email_address)
+```python
+from msgraph_email.models.email_message import EmailMessage
 
-```
-## Process  to read an email request
-By default it will read unread emails of the **'Inbox'** mailfolder
-```python
-emailMessages= emailService.readEmails() 
-```
-## Process to send an email request
-```python
-emailMessage = EmailMessage()
-emailMessage.toEmails="test@mail.com"
-emailMessage.message="Hello"
-emailService.sendEmail(message)
+async def send_email():
+    email_message = EmailMessage()
+    email_message.subject = "Test Email"
+    email_message.message = "This is a test email"
+    email_message.to_emails = ["recipient@example.com"]
+    await email_service.send_email(email_message)
+
+# Send the email
+asyncio.run(send_email())
 ```
 
-## Process to read and unread an email request
-```python
-emailMessages = emailService.readEmails()
-for email in emailMessages:
-    #mark it read
-    emailService.markEmailReadUnRead(email.messageId,isRead=True)
-    #mark it unread
-    #emailService.markEmailReadUnRead(email.messageId,isRead=False)
+### Reading Emails
 
-```
-## Make a delete email request
 ```python
-emailMessages = emailService.readEmails()
-for email in emailMessages:
-    emailService.deleteEmail(email.messageId)
+async def read_emails():
+    email_messages = await email_service.get_emails()
+    for email in email_messages:
+        print(f"Subject: {email.subject}, From: {email.sender_email}")
+
+# Read the emails
+asyncio.run(read_emails())
 ```
+
+### Marking an Email as Read/Unread
+
+```python
+async def mark_email_as_read(message_id):
+    await email_service.mark_email_read_unread(message_id, is_read=True)
+
+# Mark an email as read
+message_id = "your-message-id"
+asyncio.run(mark_email_as_read(message_id))
+```
+
+### Deleting an Email
+
+```python
+async def delete_email(message_id):
+    await email_service.delete_email(message_id)
+
+# Delete an email
+message_id = "your-message-id"
+asyncio.run(delete_email(message_id))
+```
+
+## License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.

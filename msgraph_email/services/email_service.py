@@ -1,6 +1,6 @@
 # ------------------------------------
-# Copyright (c) PixelByAJ.
-# Licensed under the MIT License.
+# Copyright (c) Abhishek Joshi - PixelByAJ.
+# Licensed under the  Apache License.
 # ------------------------------------
 import base64
 from requests import Response
@@ -54,7 +54,7 @@ class EmailService:
         else:
             return self.__client.users.by_user_id(self.__get_email_address()).messages.by_message_id(message_id)
 
-    def __getEmailAddressess(self,emailAddressess):
+    def __get_email_addressess(self,emailAddressess):
         """
         Converts a list of email addresses into a list of dictionaries with the format required by the email service.
 
@@ -75,7 +75,7 @@ class EmailService:
                 
         return _emailAddresess
 
-    def __getAttachments(self,emailMessage:EmailMessage):
+    def __get_attachments(self,emailMessage:EmailMessage):
         """
         Extracts and formats the attachments from an EmailMessage object.
         Args:
@@ -98,7 +98,7 @@ class EmailService:
 
         return __attachments
 
-    def __getEmail(self,emailMessage:EmailMessage):
+    def __get_email(self,emailMessage:EmailMessage):
         """
         Constructs an email message object from the provided EmailMessage instance.
         Args:
@@ -113,11 +113,11 @@ class EmailService:
         
         sender_recepient = Recipient()
         sender_recepient.email_address = EmailAddress(address=self.__get_email_address())
-        to_recepient = self.__getEmailAddressess(emailMessage.to_emails)
+        to_recepient = self.__get_email_addressess(emailMessage.to_emails)
         if len(emailMessage.cc_emails) > 0:
-            cc_recepient = self.__getEmailAddressess(emailMessage.cc_emails) 
+            cc_recepient = self.__get_email_addressess(emailMessage.cc_emails) 
         if len(emailMessage.bcc_emails) > 0:
-            bcc_recepient = self.__getEmailAddressess(emailMessage.bcc_bccEmails)
+            bcc_recepient = self.__get_email_addressess(emailMessage.bcc_bccEmails)
 
         _emailMessage = Message()
         _emailMessage.sender = sender_recepient
@@ -138,7 +138,7 @@ class EmailService:
         _emailMessage.body = itemBody
         
         if emailMessage.has_attachments:
-            _emailMessage.attachments = self.__getAttachments(emailMessage)
+            _emailMessage.attachments = self.__get_attachments(emailMessage)
 
         return _emailMessage
 
@@ -161,24 +161,11 @@ class EmailService:
         except requests.exceptions.HTTPError as err:
             return (err)
 
-    async def readEmails(self,mailFolder:str="Inbox",unRead:bool=True,filter:str=None, orderBy: str =None, top: int=50, skip: int=None) -> List[EmailMessage]:
-        """
-        Reads emails from a specified mail folder with optional filters and sorting.
-        Args:
-            mailFolder (str): The mail folder to read emails from. Default is "Inbox".
-            unRead (bool): If True, only unread emails will be fetched. Default is True.
-            filter (str, optional): Additional filter criteria for the emails.
-            orderBy (str, optional): The order by which to sort the emails.
-            top (str, optional): The maximum number of emails to return.
-        Returns:
-            List[EmailMessage]: A list of EmailMessage objects containing the email details.
-        Raises:
-            requests.exceptions.HTTPError: If there is an HTTP error during the request.
-        """
-
+    async def get_emails(self,is_read:bool=False,filter:str=None, orderby: str =None, top: int=50, skip: int=None) -> List[EmailMessage]:
+        
         try:
             _filter = None
-            if unRead:
+            if not is_read:
                 _filter = "IsRead eq false"
             
             if filter:
@@ -188,7 +175,7 @@ class EmailService:
                     _filter = filter
             
             query_params = MessagesRequestBuilder.MessagesRequestBuilderGetQueryParameters(
-                skip = skip, top=top, filter=_filter 
+                skip = skip, top=top,orderby=orderby,filter=_filter 
             )
             
             request_config =  MessagesRequestBuilder.MessagesRequestBuilderGetRequestConfiguration(
@@ -221,7 +208,7 @@ class EmailService:
         except requests.exceptions.HTTPError as err:
             return (err)
 
-    async def readAttachments(self,message_id:str,encodeType:str='utf-8') -> Union[List[EmailAttachment], Exception]:
+    async def get_email_attachments(self,message_id:str,encodeType:str='utf-8') -> Union[List[EmailAttachment], Exception]:
         """
         Reads the attachments of an email message by its message ID.
         Args:
@@ -258,7 +245,7 @@ class EmailService:
         except requests.exceptions.HTTPError as err:
             return (err)
 
-    async def sendEmail(self,emailMessage:EmailMessage) -> Union[Response, Exception]:
+    async def send_email(self,emailMessage:EmailMessage) -> Union[Response, Exception]:
         """
         Sends an email using the provided EmailMessage object.
         Args:
@@ -270,13 +257,13 @@ class EmailService:
             requests.exceptions.HTTPError: If an HTTP error occurs during the email sending process.
         """
         try:
-            _message = self.__getEmail(emailMessage=emailMessage)        
+            _message = self.__get_email(emailMessage=emailMessage)        
             response = await self.__get_user().send_mail.post(SendMailPostRequestBody(message=_message))
             return response
         except requests.exceptions.HTTPError as err:
             return (err)
 
-    async def markEmailReadUnread(self,message_id:str,is_read:bool=True):
+    async def mark_email_read_unread(self,message_id:str,is_read:bool=True):
         """
         Marks an email as read or unread.
         Args:
@@ -293,7 +280,7 @@ class EmailService:
         except requests.exceptions.HTTPError as err:
             return (err)
 
-    async def deleteEmail(self, message_id: str) -> Union[Response, Exception] :
+    async def delete_email(self, message_id: str) -> Union[Response, Exception] :
         """
         Deletes an email message with the given message ID.
         Args:

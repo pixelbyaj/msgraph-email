@@ -1,3 +1,7 @@
+# ------------------------------------
+# Copyright (c) Abhishek Joshi - PixelByAJ.
+# Licensed under the  Apache License.
+# ------------------------------------
 from azure.identity import ClientSecretCredential, InteractiveBrowserCredential
 from msgraph import GraphServiceClient
 
