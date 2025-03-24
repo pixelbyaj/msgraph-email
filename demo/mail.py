@@ -20,17 +20,17 @@ async def sendEmail(emailService: EmailService):
     emailMessage.subject = "Test Email"
     emailMessage.message = "This is a test email"
     emailMessage.to_emails=["abhishek2185@gmail.com"]
-    await emailService.sendEmail(emailMessage)
+    await emailService.send_email(emailMessage)
 
 async def main():
     authCredentials = AuthCredentials(client_id,tenant_id,client_secret,email_address,scopes)
     emailService = EmailService(authCredentials)
     await emailService.authenticate()
     await sendEmail(emailService)
-    emailMessages: List[EmailMessage] = await emailService.readEmails()
+    emailMessages: List[EmailMessage] = await emailService.get_emails()
     for email in emailMessages:
         #mark it read
-        await emailService.markEmailReadUnread(email.message_id,is_read=True)
+        await emailService.mark_email_read_unread(email.message_id,is_read=True)
 
 # Run the event loop
 if __name__ == '__main__':

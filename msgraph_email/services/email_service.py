@@ -39,9 +39,6 @@ class EmailService:
         self.__auth_service = AuthService(auth_credentials)
         self.__client = None
 
-    async def authenticate(self, **kwargs: Any):
-        self.__client = await self.__auth_service.get_authenticate(**kwargs)    
-
     def __get_user(self):
         return self.__client.users.by_user_id(self.__get_email_address())
    
@@ -142,6 +139,17 @@ class EmailService:
 
         return _emailMessage
 
+    async def authenticate(self, **kwargs: Any):
+        """
+        Asynchronously authenticates the email service using the provided keyword arguments.
+        Args:
+            **kwargs (Any): Arbitrary keyword arguments passed to the authentication service.
+        Returns:
+            None
+        """
+
+        self.__client = await self.__auth_service.get_authenticate(**kwargs)    
+
     async def __getMimeBody(self,message_id,attachment_id):
         """
         Asynchronously retrieves and decodes the MIME body of an email attachment.
@@ -162,6 +170,19 @@ class EmailService:
             return (err)
 
     async def get_emails(self,is_read:bool=False,filter:str=None, orderby: str =None, top: int=50, skip: int=None) -> List[EmailMessage]:
+        """
+        Retrieves a list of email messages with optional filtering, ordering, and pagination.
+        Args:
+            is_read (bool, optional): If set to False, retrieves only unread emails. Defaults to False.
+            filter (str, optional): OData filter string to apply additional filtering. Defaults to None.
+            orderby (str, optional): OData orderby string to sort the results. Defaults to None.
+            top (int, optional): The number of results to return. Defaults to 50.
+            skip (int, optional): The number of results to skip. Defaults to None.
+        Returns:
+            List[EmailMessage]: A list of EmailMessage objects representing the retrieved emails.
+        Raises:
+            requests.exceptions.HTTPError: If an HTTP error occurs during the request.
+        """
         
         try:
             _filter = None
@@ -210,16 +231,17 @@ class EmailService:
 
     async def get_email_attachments(self,message_id:str,encodeType:str='utf-8') -> Union[List[EmailAttachment], Exception]:
         """
-        Reads the attachments of an email message by its message ID.
+        Asynchronously retrieves email attachments for a given email message ID.
         Args:
-            message_id (str): The ID of the email message.
-            encodeType (str, optional): The encoding type to use for decoding the attachment content. Defaults to 'utf-8'.
+            message_id (str): The ID of the email message to retrieve attachments from.
+            encodeType (str, optional): The encoding type to use for base64 encoding. Defaults to 'utf-8'.
         Returns:
-            List[EmailAttachment]: A list of EmailAttachment objects containing the details of each attachment.
+            Union[List[EmailAttachment], Exception]: A list of EmailAttachment objects if successful, 
+            or an Exception if an error occurs.
         Raises:
             ValueError: If the message_id is not provided.
-            requests.exceptions.HTTPError: If there is an HTTP error during the request.
         """
+       
         try:
             if not message_id:
                 raise ValueError("messageId should be the id of an Email Message")
@@ -251,11 +273,12 @@ class EmailService:
         Args:
             emailMessage (EmailMessage): The email message to be sent.
         Returns:
-            response: The response from the email sending operation.
-            If an HTTP error occurs, the error is returned instead.
+            Union[Response, Exception]: The response from the email service if successful, 
+                                        or an exception if an error occurs.
         Raises:
-            requests.exceptions.HTTPError: If an HTTP error occurs during the email sending process.
+            requests.exceptions.HTTPError: If an HTTP error occurs during the request.
         """
+        
         try:
             _message = self.__get_email(emailMessage=emailMessage)        
             response = await self.__get_user().send_mail.post(SendMailPostRequestBody(message=_message))
@@ -268,7 +291,7 @@ class EmailService:
         Marks an email as read or unread.
         Args:
             message_id (str): The ID of the email message to be marked.
-            isRead (bool, optional): Flag indicating whether the email should be marked as read (True) or unread (False). Defaults to True.
+            is_read (bool, optional): Flag indicating whether the email should be marked as read (True) or unread (False). Defaults to True.
         Returns:
             response: The response object from the patch request if successful.
             err: The HTTPError exception if the request fails.
