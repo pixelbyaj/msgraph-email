@@ -99,6 +99,18 @@ message_id = "your-message-id"
 asyncio.run(delete_email(message_id))
 ```
 
+---
+
+### Build & Publish to PyPI
+Ensure you have `twine` installed:
+
+```sh
+pip install build twine
+python -m build
+twine upload dist/*
+```
+Enter your PyPI credentials when prompted.
+
 ## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.

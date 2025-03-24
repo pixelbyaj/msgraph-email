@@ -1,5 +1,5 @@
 import pathlib
-from setuptools import setup,find_packages
+from setuptools import setup, find_packages
 
 # The directory containing this file
 HERE = pathlib.Path(__file__).parent
@@ -9,24 +9,24 @@ README = (HERE / "README.md").read_text()
 # This call to setup() does all the work
 setup(
     name="msgraph-email",
-    version="1.3.0",
-    description="Read/Send emails using Microsoft Graph API",    
+    version="2.0.0",
+    description="Automate your emails using Microsoft Graph API",    
     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/pixelbyaj/msgraph-email",
-    author="PixelByAJ - Abhishek Joshi",
+    author="Abhishek Joshi - PixelbyAJ",
     author_email="pixelbyaj.dev@gmail.com",
     license="Apache",
     classifiers=[
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python :: 3.13",
     ],
-    packages=find_packages(exclude=("demo")),
-    include_package_data=True,
-    install_requires=["requests", "msgraph-sdk","azure-identity"],
-    entry_points={
-        "console_scripts": [
-            "realpython=reader.__main__:main",
-        ]
+    keywords="microsoft graph email outlook api",
+    project_urls={
+        "Documentation": "https://github.com/pixelbyaj/msgraph-email#readme",
+        "Source": "https://github.com/pixelbyaj/msgraph-email",
     },
+    packages=find_packages(include=["msgraph_email*"], exclude=["demo"]),
+    include_package_data=True,
+    install_requires=["requests", "msgraph-sdk","azure-identity"]
 )
