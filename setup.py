@@ -9,7 +9,7 @@ README = (HERE / "README.md").read_text()
 # This call to setup() does all the work
 setup(
     name="msgraph-email",
-    version="2.0.0",
+    version="2.0.1",
     description="Automate your emails using Microsoft Graph API",    
     long_description=README,
     long_description_content_type="text/markdown",

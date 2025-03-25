@@ -1,6 +1,5 @@
-# msgraph-email
-
-msgraph-email is a Python package that allows you to read and send emails using the Microsoft Graph API. It provides a simple interface to interact with Microsoft Graph for email operations.
+# Automate your Emails with msgraph-email
+**msgraph-email** allows you to automate email operation using the Microsoft Graph API. It provides a simple interface to interact with Microsoft Graph Email API.
 
 [![License](https://img.shields.io/badge/License-apache-blue.svg)](https://img.shields.io/badge/)
 [![Downloads](https://static.pepy.tech/badge/msgraph-email)](https://pepy.tech/project/msgraph-email)
