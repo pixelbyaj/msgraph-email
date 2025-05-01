@@ -68,7 +68,7 @@ async def send_email():
     emailAttachment = EmailAttachment()
     emailAttachment.name = "test.txt"
     emailAttachment.content_type = "text/plain"
-    emailAttachment.content_bytes = base64.b64encode("This is a test attachment")
+    emailAttachment.content_bytes = bytearray(base64.b64encode("This is a test attachment".encode("utf-8")))
     emailMessage.attachments = [
         emailAttachment
     ]
