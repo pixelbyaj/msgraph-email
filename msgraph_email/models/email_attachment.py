@@ -10,11 +10,11 @@ class EmailAttachment:
     file_id: str
     name: str
     content_type: str
-    content_base64: bytearray
+    content_bytes: bytes
     size: int
     is_inline: bool
     is_mime_type: bool
-    mime_body: str
+    mime_body: bytearray
 
 
 

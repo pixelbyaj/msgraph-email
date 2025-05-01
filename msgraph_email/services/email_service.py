@@ -10,6 +10,7 @@ from msgraph.generated.users.item.messages.messages_request_builder import Messa
 from msgraph.generated.users.item.send_mail.send_mail_post_request_body import SendMailPostRequestBody
 from msgraph.generated.models.message_collection_response import MessageCollectionResponse
 from msgraph.generated.models.attachment import Attachment
+from msgraph.generated.models.file_attachment import FileAttachment
 from msgraph.generated.models.message import Message
 from msgraph.generated.models.recipient import Recipient
 from msgraph.generated.models.item_body import ItemBody
@@ -87,11 +88,11 @@ class EmailService:
 
         __attachments=[]
         for file in emailMessage.attachments:
-            __attachments.append({
-                "name":file.name,
-                "content_type":file.contentType,
-                "content_bytes":file.contentBase64
-            })
+           __attachments.append(FileAttachment(
+                name=file.name,
+                content_type=file.content_type,
+                content_bytes=base64.urlsafe_b64decode(file.content_bytes))
+            )
 
         return __attachments
 
@@ -114,7 +115,7 @@ class EmailService:
         if len(emailMessage.cc_emails) > 0:
             cc_recepient = self.__get_email_addressess(emailMessage.cc_emails) 
         if len(emailMessage.bcc_emails) > 0:
-            bcc_recepient = self.__get_email_addressess(emailMessage.bcc_bccEmails)
+            bcc_recepient = self.__get_email_addressess(emailMessage.bcc_emails)
 
         _emailMessage = Message()
         _emailMessage.sender = sender_recepient
@@ -150,6 +151,44 @@ class EmailService:
 
         self.__client = await self.__auth_service.get_authenticate(**kwargs)    
 
+    async def get_email_attachments(self,message_id:str,encodeType:str='utf-8') -> Union[List[EmailAttachment], Exception]:
+        """
+        Asynchronously retrieves email attachments for a given email message ID.
+        Args:
+            message_id (str): The ID of the email message to retrieve attachments from.
+            encodeType (str, optional): The encoding type to use for base64 encoding. Defaults to 'utf-8'.
+        Returns:
+            Union[List[EmailAttachment], Exception]: A list of EmailAttachment objects if successful, 
+            or an Exception if an error occurs.
+        Raises:
+            ValueError: If the message_id is not provided.
+        """
+       
+        try:
+            if not message_id:
+                raise ValueError("messageId should be the id of an Email Message")
+
+            response = await self.__get_user_messages(message_id).attachments.get()
+            _attachments=list()
+            for file in response.value:
+                _file = EmailAttachment()
+                _file.file_id = file.id
+                _file.name = file.name
+                _file.size = file.size
+                _file.content_type = file.content_type
+                
+                if _file.content_type != "message/rfc822":                            
+                    _file.content_bytes = base64.b64decode(file.content_bytes)
+                else:
+                    _file.is_mime_type=True
+                    _file.mime_body = await self.__getMimeBody(message_id, _file.fileId)
+
+                _attachments.append(_file)
+
+            return _attachments
+        except requests.exceptions.HTTPError as err:
+            return (err)
+        
     async def __getMimeBody(self,message_id,attachment_id):
         """
         Asynchronously retrieves and decodes the MIME body of an email attachment.
@@ -220,50 +259,12 @@ class EmailService:
                     _msg.message = message.body.content
                     _msg.is_read = message.is_read
                     if _msg.has_attachments:
-                        _msg.attachments = self.readAttachments(_msg.message_id)
+                        _msg.attachments = await self.get_email_attachments(_msg.message_id)
 
                     _emailMessages.append(_msg)
 
             return _emailMessages
 
-        except requests.exceptions.HTTPError as err:
-            return (err)
-
-    async def get_email_attachments(self,message_id:str,encodeType:str='utf-8') -> Union[List[EmailAttachment], Exception]:
-        """
-        Asynchronously retrieves email attachments for a given email message ID.
-        Args:
-            message_id (str): The ID of the email message to retrieve attachments from.
-            encodeType (str, optional): The encoding type to use for base64 encoding. Defaults to 'utf-8'.
-        Returns:
-            Union[List[EmailAttachment], Exception]: A list of EmailAttachment objects if successful, 
-            or an Exception if an error occurs.
-        Raises:
-            ValueError: If the message_id is not provided.
-        """
-       
-        try:
-            if not message_id:
-                raise ValueError("messageId should be the id of an Email Message")
-
-            response = await self.__get_user_messages(message_id).attachments.get()
-            _attachments=[]
-            for file in response.value:
-                _file = EmailAttachment()
-                _file.file_id = file.id
-                _file.name = file.name
-                _file.size = file.size
-                _file.content_type = file.content_type
-                
-                if _file.content_type != "message/rfc822":                            
-                    _file.content_base64 = base64.b64encode(file.content_bytes).decode(encodeType)
-                else:
-                    _file.is_mime_type=True
-                    _file.mime_body = await self.__getMimeBody(message_id, _file.fileId).decode(encodeType)
-
-                _attachments.append(_file)
-
-            return _attachments
         except requests.exceptions.HTTPError as err:
             return (err)
 

@@ -1,5 +1,7 @@
 import asyncio
+import base64
 from typing import List
+from msgraph_email.models.email_attachment import EmailAttachment
 from msgraph_email.services.email_service import EmailService
 from msgraph_email.models.email_message import EmailMessage
 from msgraph_email.models.auth_credentials import AuthCredentials
@@ -20,17 +22,34 @@ async def send_email(emailService: EmailService):
     emailMessage.subject = "Test Email"
     emailMessage.message = "This is a test email"
     emailMessage.to_emails=["abhishek2185@gmail.com"]
+    emailMessage.has_attachments = True
+    emailAttachment = EmailAttachment()
+    emailAttachment.name = "test.txt"
+    emailAttachment.content_type = "text/plain"
+    emailAttachment.content_bytes = base64.b64encode("This is a test attachment")
+    emailMessage.attachments = [
+        emailAttachment
+    ]
     await emailService.send_email(emailMessage)
 
 async def main():
     authCredentials = AuthCredentials(client_id,tenant_id,client_secret,email_address,scopes)
     emailService = EmailService(authCredentials)
     await emailService.authenticate()
-    await send_email(emailService)
+   # await send_email(emailService)
     emailMessages: List[EmailMessage] = await emailService.get_emails()
     for email in emailMessages:
+        for attachment in email.attachments:
+            print(f"Attachment Name: {attachment.name}")
+            print(f"Attachment Size: {attachment.size} bytes")
+            print(f"Attachment Content Type: {attachment.content_type}")
+            
+            # Save the attachment to a file
+            with open(attachment.name, "wb") as f:
+                f.write(attachment.content_bytes)
+                
         #mark it read
-        await emailService.mark_email_read_unread(email.message_id,is_read=True)
+        #await emailService.mark_email_read_unread(email.message_id,is_read=True)
 
 # Run the event loop
 if __name__ == '__main__':

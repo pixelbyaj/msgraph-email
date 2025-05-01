@@ -64,6 +64,14 @@ async def send_email():
     email_message.subject = "Test Email"
     email_message.message = "This is a test email"
     email_message.to_emails = ["recipient@example.com"]
+
+    emailAttachment = EmailAttachment()
+    emailAttachment.name = "test.txt"
+    emailAttachment.content_type = "text/plain"
+    emailAttachment.content_bytes = base64.b64encode("This is a test attachment")
+    emailMessage.attachments = [
+        emailAttachment
+    ]
     await email_service.send_email(email_message)
 
 # Send the email
@@ -77,6 +85,14 @@ async def read_emails():
     email_messages = await email_service.get_emails()
     for email in email_messages:
         print(f"Subject: {email.subject}, From: {email.sender_email}")
+        for attachment in email.attachments:
+            print(f"Attachment Name: {attachment.name}")
+            print(f"Attachment Size: {attachment.size} bytes")
+            print(f"Attachment Content Type: {attachment.content_type}")
+            
+            # Save the attachment to a file
+            with open(attachment.name, "wb") as f:
+                f.write(attachment.content_bytes)
 
 # Read the emails
 asyncio.run(read_emails())

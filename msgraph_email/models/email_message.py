@@ -2,7 +2,7 @@
 # Copyright (c) Abhishek Joshi - PixelByAJ.
 # Licensed under the Apache License.
 # ------------------------------------
-from typing import Optional, Set
+from typing import List, Optional, Set
 
 from .email_attachment import EmailAttachment
 
@@ -20,5 +20,5 @@ class EmailMessage:
     message: Optional[str] = None
     message_preview: Optional[str] = None
     has_attachments: bool = False
-    attachments: Set[EmailAttachment] = set()
+    attachments: List[EmailAttachment] = list()
     is_read: bool = False

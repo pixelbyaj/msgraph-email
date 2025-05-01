@@ -51,9 +51,9 @@ class AuthService:
         credentials = None
         if self.__auth_credentials.email_address:
             self.__email_address = self.__auth_credentials.email_address
-            credentials = self.__get_client_secret_credentials(self)
-            self.__client = GraphServiceClient(credential=credentials, scopes=self.__auth_credentials.scopes, **kwargs)
-            self.__display_name = await self.__client.users.by_user_id(self._emailAddress).get().user_principal_name
+            credentials = self.__get_client_secret_credentials()
+            self.__client = GraphServiceClient(credentials=credentials, scopes=self.__auth_credentials.scopes, **kwargs)
+            self.__display_name = await self.__client.users.by_user_id(self.__email_address).get().user_principal_name
         else:
             credentials = self.__get_interactive_credentials(**kwargs)
             self.__client = GraphServiceClient(credentials=credentials, scopes=self.__auth_credentials.scopes, **kwargs)
