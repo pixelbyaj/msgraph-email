@@ -26,17 +26,13 @@ async def send_email(emailService: EmailService):
     emailAttachment = EmailAttachment()
     emailAttachment.name = "test.txt"
     emailAttachment.content_type = "text/plain"
-    emailAttachment.content_bytes = base64.b64encode("This is a test attachment")
+    emailAttachment.content_bytes = bytearray(base64.b64encode("This is a test attachment".encode("utf-8")))
     emailMessage.attachments = [
         emailAttachment
     ]
     await emailService.send_email(emailMessage)
-
-async def main():
-    authCredentials = AuthCredentials(client_id,tenant_id,client_secret,email_address,scopes)
-    emailService = EmailService(authCredentials)
-    await emailService.authenticate()
-   # await send_email(emailService)
+    
+async def read_email(emailService: EmailService):
     emailMessages: List[EmailMessage] = await emailService.get_emails()
     for email in emailMessages:
         for attachment in email.attachments:
@@ -49,7 +45,14 @@ async def main():
                 f.write(attachment.content_bytes)
                 
         #mark it read
-        #await emailService.mark_email_read_unread(email.message_id,is_read=True)
+        await emailService.mark_email_read_unread(email.message_id,is_read=True)
+    
+async def main():
+    authCredentials = AuthCredentials(client_id,tenant_id,client_secret,email_address,scopes)
+    emailService = EmailService(authCredentials)
+    await emailService.authenticate()
+    await send_email(emailService)
+    #await read_email(emailService)
 
 # Run the event loop
 if __name__ == '__main__':
